@@ -47,6 +47,8 @@ class Report(models.Model):
 
 class MeltReport(models.Model):
 	code			= models.CharField(max_length=200, blank=True, null=True)
+	name			= models.CharField(max_length=200,blank=True, null=True)
+	mobile_no		= models.CharField(max_length=200,blank=True, null=True)
 	particular		= models.CharField(max_length=200)
 	imei1 = models.CharField(max_length=1000, blank=True, null=True)
 	imei2 = models.CharField(max_length=1000, blank=True, null=True)

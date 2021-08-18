@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
-{% block title %}Kalara Mobile World    | Invoice{% endblock %}
+{% block title %}Kalra Mobile World    | Invoice{% endblock %}
 {% block content %}
 <table class="table table-bordered table-hover table-responsive">
 
     <thead class="thead-dark text-center">
         <tr>
             <th colspan="5">
-                <h3><br>Rahul Kalara Mobile</h3>
+                <h3><br>Rahul Kalra Mobile</h3>
                 <h5>Haripur kalan Dehradun</h5>
-                <h5>Mobile No:1234567890,03211654987</h5>
+                <h5>Mobile No:9813177700,9897771073</h5>
                 <h5>Email : test@gmail</h5>
-                <h5> <b>GSTIN</b> : 27APGPM6700G1ZZ </h5>
+                <h5> <b>GSTIN</b> : 05BFMPK7364F2Z8 </h5>
             </th>
         </tr>
     </thead>
@@ -21,12 +21,13 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon1">To, M/S</span>
                         </div>
-                        <INPUT TYPE="TEXT" NAME="company-name" autocomplete="on" id="company-name" class="form-control" placeholder="Customer Name">  
+                        <INPUT TYPE="TEXT" NAME="company-name" autocomplete="on" id="company-name" class="form-control" placeholder="Customer Name">
+                        <INPUT TYPE="TEXT" NAME="mobile-number" autocomplete="on" id="mobile-number" class="form-control" placeholder="Mobile Number">  
                     </div> 
                     <div class="input-group" style="margin-top: 2%">
                             <b>HSN Code:</b>
                             <select id="get_hsc_value" class="form-control" style="margin-left: 2%">
-                                <option value="%">Select Code</option>
+                                <option value=""></option>
                                 {% for work in hsc %} 
                                     <option value="{{ work.hsc_number }}">{{ work.hsc_number }}</option>
                                 {% endfor %}
@@ -34,7 +35,7 @@
                     </div>
                 </td>
                 <td colspan = "3" style="vertical-align: middle">
-                    <b>GSTIN</b> : 27APGPM6700G1ZZ <br><br>
+                    <b>GSTIN</b> : 05BFMPK7364F2Z8 <br><br>
                         <b style="font-size:20px;">Invoice Number : <span style="color: red;"><b>{{ challan_number }}</b></span></b>
                     </div>
                     <br><br>
@@ -65,7 +66,7 @@
             <tr class="text-center">
                 <td>
                     <select id="get_code_values1" class="form-control">
-                        <option value="%">Select Code</option>
+                        <option></option>
                         {% for work in works %} 
                          <option value="{{ work.code }}">{{ work.name }}</option>
                         {% endfor %}
@@ -88,7 +89,7 @@
             <tr>
                 <td colspan="2" rowspan="2">
                     IMEI No.1<h5 class="value2" ></h5><br>
-                    IMEI No.1<h5 class="value3" ></h5>
+                    IMEI No.2<h5 class="value3" ></h5>
                 
                 </td>
                 
@@ -152,7 +153,7 @@
                     <br>
                     <br>
                     <div style="vertical-align: bottom !important; text-align: center">
-                        For Kalara Mobile World
+                        For Kalra Mobile World
                     </div>
                 </td>
             </tr>
@@ -163,8 +164,9 @@
     <div class="row text-center">
         <div class="col">
             <div class="btn btn-group">
-                <div class="btn btn-success" id="download">Download</div>
-                <div class="btn btn-warning" id="clear" onclick="return confirm('Are you sure?');">Clear</div>
+                <div class="btn btn-success" id="download" style="margin: 05px;">Download PDF</div>
+                <div class="btn btn-success" id="print" style="margin: 05px;">Print</div>
+                <div class="btn btn-warning" id="clear" style="margin: 05px;" onclick="return confirm('Are you sure?'); ">Clear</div>
             </div>
         </div>
     </div>
@@ -173,6 +175,11 @@
 
 {% block javascript %}
 <script>
+    $(document).ready(function () {
+        $('select').selectize({
+            sortField: 'text'
+        });
+    });
     $("#clear").on("click", function(){
         $("input").val('');
     });
@@ -264,6 +271,7 @@
             type : "GET",
             data : {
                 "company_name"      : $("input[name=company-name]").val(),
+                "mobile_no"      : $("input[name=mobile-number]").val(),
                 "hsc_number"        : $("#get_hsc_value option:selected").val(),
                 "date"              : $("#date").val(),
                 "code1"             : $("#get_code_values1 option:selected").val(),
@@ -301,6 +309,52 @@
                 // link.download="download.pdf";
                 // link.click();
                 window.location = "/works/get/pdf/";
+                setTimeout(function(){
+                    // window.location.replace("/works/invoice/melt/");
+                }, 3000);
+            }
+        });
+    });
+    $("#print").on("click", function(){
+        $.ajax({
+            url : "{% url 'generate_pdf' %}",
+            type : "GET",
+            data : {
+                "company_name"      : $("input[name=company-name]").val(),
+                "mobile_no"      : $("input[name=mobile-number]").val(),
+                "hsc_number"        : $("#get_hsc_value option:selected").val(),
+                "date"              : $("#date").val(),
+                "code1"             : $("#get_code_values1 option:selected").val(),
+                "vendor_name1"      : $(".value1").text(),
+                "imei_name1"      : $(".value2").text(),
+                "imei_name2"      : $(".value3").text(),
+                // "rate1"             : $(".amount1").text(),
+                "rate1"             : $("input[name=amount1]").val(),
+                "amount1"           : $("input[name=amount1]").val(),
+                "quantity1"         : $("input[name=quantity1]").val(),
+               
+                "cgst"              : $("input[name=cgst]").val(),
+                "cgst_amount"       : $("input[name=cgst-amount]").val(),
+                "sgst"              : $("input[name=sgst]").val(),
+                "sgst_amount"       : $("input[name=sgst-amount]").val(),
+                "total"             : $("input[name=total]").val(),
+                "grand_total"       : $("input[name=grand-total]").val(),
+
+                // "dated"             : $("input[name=dated]").val(),
+                "challan_number"    : "{{ challan_number }}",
+            },
+            dataType : "json",
+            success : function(data){
+                // window.location = "/works/get/pdf/";
+                printWindow = window.open('/works/test/');
+                printWindow.print();
+                setTimeout(function(){
+                    // window.location.replace("/works/invoice/melt/");
+                }, 3000);
+            },
+            error: function(data){
+                printWindow = window.open('/works/test/');
+                printWindow.print();
                 setTimeout(function(){
                     window.location.replace("/works/invoice/melt/");
                 }, 3000);

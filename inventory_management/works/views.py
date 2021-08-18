@@ -69,6 +69,8 @@ def generate_pdf(request):
     # context['dated'] = datetime.datetime.strptime(context.get('dated'), '%Y-%m-%d').strftime('%d-%m-%Y')
     context['amount_in_words'] = num2words.number_to_words(round(float(context.get('grand_total')), 2)) + ' only'
     code            = request.GET.get('code1')
+    name            = request.GET.get('company_name')
+    mobile_no       = request.GET.get('mobile_no')
     particular      = request.GET.get('vendor_name1')
     imei1           = request.GET.get('imei_name1')
     imei2           = request.GET.get('imei_name2')
@@ -88,18 +90,20 @@ def generate_pdf(request):
     try:
         report = MeltReport(
                     code=code,
+                    name=name,
+                    mobile_no=mobile_no,
                     particular=particular,
                     imei1=imei1,
                     imei2=imei2,
                     challan_number=challan_number,
                     date=date,
                     quantity=quantity,
-                    rate=rate,
+                    rate=total,
                     amount=amount,
                     hsc_number=hsc_number,
                     cgst_amount=cgst_amount,
                     sgst_amount=sgst_amount,
-                    total=total,
+                    total=rate,
                     
                 )
         report.save()
@@ -111,18 +115,20 @@ def generate_pdf(request):
         MeltReport.objects.filter(challan_number=challan_number).delete()
         report = MeltReport(
                     code=code,
+                    name=name,
+                    mobile_no=mobile_no,
                     particular=particular,
                     imei1=imei1,
                     imei2=imei2,
                     challan_number=challan_number,
                     date=date,
                     quantity=quantity,
-                    rate=rate,
+                    rate=total,
                     amount=amount,
                     hsc_number=hsc_number,
                     cgst_amount=cgst_amount,
                     sgst_amount=sgst_amount,
-                    total=total,
+                    total=rate,
                 )
         report.save()
 
@@ -135,13 +141,15 @@ def generate_pdf(request):
 def get_pdf(request):
     # print("deepaak")
     # print(request.session['context'])
-    pdf = render_to_pdf('pdf/invoice_generator.html', request.session['context'])   
+    pdf = render_to_pdf('pdf/invoice_generator.html', request.session['context'])
+  
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Melt_Invoice_{}.pdf".format(request.session.get('context').get('challan_number'))
         content = "inline; filename={}".format(filename)
         content = "attachment; filename={}".format(filename)
         response['Content-Disposition'] = content
+        
         return response
     return HttpResponse("Not found")
 
@@ -764,8 +772,9 @@ def stock_report_monthly(request):
 def test(request):
     from django.contrib.staticfiles.templatetags.staticfiles import static
     context_dict = {}
+    context_dict =request.session['context']
     context_dict['logo'] = static('img/logo.png')
     context_dict['apple'] = static('img/apple.png')
     context_dict['samsung'] = static('img/samsung.png')
     context_dict['oppo'] = static('img/oppo.png')
-    return render(request, 'pdf/invoice_generator.html', context_dict)
+    return render(request,'pdf/invoice_generator_print.html',context_dict)
